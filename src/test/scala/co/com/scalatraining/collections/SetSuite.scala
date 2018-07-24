@@ -152,4 +152,16 @@ class SetSuite extends FunSuite {
     assert(r.tail.tail.tail.head == 3)
   }
 
+  test("Teoria de conjuntos"){
+    //Suma de conjuntos
+    val conjunto1: Set[Int] =Set(1,2,3,4,5)
+    val conjunto2: Set[Int] =Set(6,7,8,9,0)
+    assertResult(Set(1,2,3,4,5,6,7,8,9,0)){
+      (conjunto1.mkString + conjunto2.mkString).toCharArray.map(x=>x.toString).map(x=>x.toInt).toSet
+
+    }
+
+
+  }
+
 }

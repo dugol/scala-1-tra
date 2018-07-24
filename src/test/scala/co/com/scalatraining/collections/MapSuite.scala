@@ -18,6 +18,8 @@ class MapSuite extends FunSuite {
     val map = Map("1" -> 1, "2" -> 2, "3" -> 3)
     assertResult(6) {
       var sum = 0
+      //X es una tupla, también se puede obtener los dos valore
+      //map.foreach{case (k,v) = >}
       map.foreach((x) =>
         sum += x._2
       )
@@ -128,6 +130,14 @@ class MapSuite extends FunSuite {
     assertResult(Map("1" -> 1, "2" -> 4, "3" -> 9)) {
       map.mapValues(valor => valor * valor)
     }
+  }
+
+  test("Map how many times is the word"){
+    val palabra="hola a todos hola"
+    val map2=palabra.split(" ").groupBy(identity).mapValues(_.length)
+    assert(map2===Map("hola"->2,"a"->1,"todos"->1))
+
+
   }
 
 }

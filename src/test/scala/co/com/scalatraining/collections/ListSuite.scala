@@ -207,6 +207,15 @@ class ListSuite extends FunSuite {
 
   }
 
+  test("Obtener el promedio de las listas FlatMap Use"){
+    val lista=List(List(1,1), List(2,2),Nil)
+    val listaRes=lista.filter( l=> l.size!=0)
+
+    val res=listaRes.flatMap(l => List((l.sum)/(l.size)))
+    assert(res==List(1,2))
+
+  }
+
   test("Una lista se debe poder dividir") {
     val lista = List(1, 2, 3, 4)
     val t: (List[Int], List[Int]) = lista.splitAt(2)
