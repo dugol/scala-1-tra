@@ -84,7 +84,7 @@ class MapSuite extends FunSuite {
   }
 
   test("split en un Map") {
-    val map = Map("1" -> 1, "2" -> 2, "3" -> 3)
+    val map: Map[String, Int] = Map("1" -> 1, "2" -> 2, "3" -> 3)
     val (map2, map3) = map.splitAt(2)
     assert(map2 == Map("1" -> 1, "2" -> 2) && map3 == Map("3" -> 3))
   }
