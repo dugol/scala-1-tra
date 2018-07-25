@@ -21,9 +21,10 @@ class Historial(cotizacion: List[Cotizacion]) {
   }
 
   //Elegir el mayor IBC
-  def reglaCuatro(cotizacion: List[Cotizacion])={
+  //def reglaCuatro(cotizacion: List[Cotizacion]): List[Tupla]={
+    //cotizacion.groupBy(x=>x.aportante).groupBy(x=>x._2.groupBy(x=>x.ibc))
 
-    
-  }
+
+  //}
 
 }
