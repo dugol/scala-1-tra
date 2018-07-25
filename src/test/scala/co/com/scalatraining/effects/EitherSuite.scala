@@ -4,11 +4,13 @@ import org.scalatest.FunSuite
 
 class EitherSuite extends FunSuite{
 
+  //Contruir izquierda
   test("Either left"){
     val e = Left(1)
     assert(e.isLeft)
   }
 
+  //Construir derecha
   test("Either right"){
     val e = Right(1)
     assert(e.isRight)

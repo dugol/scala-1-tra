@@ -35,25 +35,36 @@ class TrySuite extends FunSuite with Matchers {
   test("Se debe poder hacer pattern match sobre un Try que es Failure"){
     f match {
       case Success(valor) => assert(false)
-      case Failure(e) => assert(true)
+      case Failure(e) => {
+        println(s"La excepcion generada en pattern Match es ${e.getMessage}")
+        assert(true)
+
+      }
     }
   }
 
   test("Se debe poder hacer pattern match sobre un Try que es Success"){
     s match {
-      case Success(valor) => assert(true)
+      case Success(valor) => {
+        assert(valor===1)
+        assert(true)
+      }
       case Failure(e) => assert(false)
     }
   }
 
+  //Queda el mismo failure del que partimos, map no tiene efecto sobre este
   test("Un Failure se debe poder map"){
     val res = f.map(x=>"HOLA")
     assert(res.isFailure)
   }
 
+
   test("Un Success se debe poder map [assert con for-comp]"){
     val res = s.map(x=>"HOLA")
     assert(res.isSuccess)
+    assert(s===Success(1))
+    assert(res===Success("HOLA"))
 
     for{
       ss <- res
@@ -87,6 +98,20 @@ class TrySuite extends FunSuite with Matchers {
 
   }
 
+  test("Error en la recuperación con recover") {
+    val rec=f.recover{
+      case e:Exception => new Exception("Error propio")
+    }
+    rec match{
+      case Success(e)=> {
+        e match {
+          case ex: Exception => assert(ex.getMessage() === "Error propio")
+        }
+      }
+      case Failure(e)=> assert(false)
+      }
+  }
+
   test("Un Failure se debe poder recuperar con recoverWith"){
 
     val res = f.map(x=>"HOLA")
@@ -94,7 +119,7 @@ class TrySuite extends FunSuite with Matchers {
       s
     }}
 
-    res.flatMap(x => Try(assert(x == 1)) )
+    assert(res===Success(1))
 
   }
 
@@ -149,6 +174,38 @@ class TrySuite extends FunSuite with Matchers {
     } yield x + y + z
 
     assert(res.isFailure)
+
+  }
+
+  test("Try for-com. A chain of Tries with a Failure is a Failure Recovery"){
+
+    val res = for{
+      x <- s
+      y <- f.recover{case e: Exception=> {
+
+      6}}
+      z <- s
+    } yield x + y + z
+
+    assert(res===Success(8))
+
+  }
+
+  test("Try for-com. A chain of Tries with a Failure is a Failure Recovery despues de evaluar"){
+
+    val res = for{
+      x <- s
+      y <- f
+      z <- s
+    } yield x + y + z
+
+    println(s"La falla es:${res}")
+
+    val res2=res.recover{case e:Exception => {
+      1001
+    }}
+
+    assert(res2===Success(1001))
 
   }
 

@@ -379,7 +379,7 @@ class OptionSuite extends FunSuite {
 
     assert(res===res2)
   }
-  
+
 
 
 
