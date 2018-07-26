@@ -321,7 +321,7 @@ class FutureSuite extends FunSuite {
 
     //--------------------Punto 3--------------------------------------------
     def obtenerUsuarioCompleto(nombreUsuario: String): UsuarioCompleto={
-      val repos=obtenerRepositorios(nombreUsuario)
+      val repos=obtenerRepositorios(nombreUsuario).sortBy(x=>x.lineas).reverse
       val lenguajes=repos.groupBy(x=>x.lenguaje).mapValues(_.length)
       UsuarioCompleto(repos,lenguajes)
     }
@@ -332,7 +332,7 @@ class FutureSuite extends FunSuite {
 
     val c= futuroObtenerUsuarioCompleto("Daniel")
     val uc=Await.result(c,1 seconds)
-    assert(uc===UsuarioCompleto(List(Repositorio("Daniel","Hello Word","Java",1000), Repositorio("Daniel","FizzBuzz","Java",3000), Repositorio("Daniel","calculadora","Scala",500)),Map("Scala" -> 1, "Java" -> 2)))
+    assert(uc===UsuarioCompleto(List(Repositorio("Daniel","FizzBuzz","Java",3000), Repositorio("Daniel","Hello Word","Java",1000), Repositorio("Daniel","calculadora","Scala",500)),Map("Scala" -> 1, "Java" -> 2)))
 
 
 
