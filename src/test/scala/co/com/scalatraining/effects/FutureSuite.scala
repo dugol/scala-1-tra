@@ -1,11 +1,8 @@
 package co.com.scalatraining.effects
 
-import java.util.Random
 import java.util.concurrent.Executors
 
 import org.scalatest.FunSuite
-
-import scala.collection.immutable.{IndexedSeq, Seq}
 import scala.language.postfixOps
 import scala.util.{Failure, Success}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -210,6 +207,137 @@ class FutureSuite extends FunSuite {
     assert(res==1)
   }
 
+  /*
+  test("propuesta Future"){
+
+    val ecParaServicioClima = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(5))
+    val ecParaAccesoBD=ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(1))
+
+    object clima {
+
+      def getClima():String={
+      println(s"Clima: ${System.currentTimeMillis()} ${Thread.currentThread().getName}")
+      "26/07/2018-10:00, 18°C"
+    }
+
+      def returnFuture():Future[String]= {
+        val f1 = Future {
+
+          Thread.sleep(100)
+          getClima()
+        }(ecParaServicioClima)
+
+        f1
+      }
+
+    }
+
+    object guardar{
+      def save():String={
+        println(s"Guardar: ${System.currentTimeMillis()} ${Thread.currentThread().getName}")
+        "Guardé en la base de datos."
+
+      }
+
+      def returnFuture():Future[String]= {
+        val f2 = Future {
+
+          Thread.sleep(20)
+          save()
+        }(ecParaAccesoBD)
+        f2
+      }
+    }
+    Range(1,30).map{
+      x=>x
+      clima.returnFuture()
+      guardar.returnFuture()
+      //Await.result(clima.returnFuture(),10 seconds)
+     // Await.result(guardar.returnFuture(),10 seconds)
+
+    }
+
+
+  }
+  */
+
+  test("Ejercicio 2 Futuros"){
+    case class Repositorio(dueño:String,nombre:String, lenguaje:String, lineas: Int)
+    case class Usuario(nombre: String)
+    case class UsuarioCompleto(repositorios: List[Repositorio], lenguajes: Map[String,Int])
+    val repo1: Repositorio=Repositorio("Daniel","Hello Word", "Java", 1000)
+    val repo2: Repositorio=Repositorio("Juan","Hola Mundo", "Scala", 2000)
+    val repo3: Repositorio=Repositorio("Daniel","FizzBuzz", "Java", 3000)
+    val repo4: Repositorio=Repositorio("Juan","foo", "Java", 1000)
+    val repo5: Repositorio=Repositorio("Daniel","calculadora", "Scala", 500)
+    val repo6: Repositorio=Repositorio("Juan","Banco", "Scala", 700)
+    val repositorios:List[Repositorio]=List(repo1,repo2,repo3,repo4,repo5,repo6)
+    val usuario1:Usuario=Usuario("Daniel")
+    val Usuario2:Usuario=Usuario("Juan")
+    implicit val ecParaRepos = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(5))
+
+    //Obtener los repositorios
+    def obtenerRepositorios(usuario:String):List[Repositorio]={
+      repositorios.filter(x=>x.dueño==usuario)
+
+    }
+
+    //Obtener futuro de repositorios
+    def FuturoRepositorios(usuario:String):Future[List[Repositorio]]= {
+      //implicit val ecParaRepos = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(5))
+      Future{obtenerRepositorios(usuario)}
+    }
+
+
+    //Evaluación de la funcion
+    val a = FuturoRepositorios("Daniel")
+
+    //Comprobar el retorno.
+    val repositoriosDaniel=Await.result(a, 1 seconds)
+
+    assert(repositoriosDaniel===List(Repositorio("Daniel","Hello Word","Java",1000), Repositorio("Daniel","FizzBuzz","Java",3000), Repositorio("Daniel","calculadora","Scala",500)))
+    //---------------------------------------------punto 2---------------------------------------------------------------
+
+    //Obtener un repositorio especifico
+    def obtenerRepositorioEspecifico(dueño:String,nombre:String):Repositorio={
+      obtenerRepositorios(dueño).filter(x=>x.nombre==nombre).head
+    }
+
+    //Obtener un Future del repositorio especifico
+    def futuroRepositorioEspecifico(dueño:String, nombre:String):Future[Repositorio]={
+      //implicit val ecParaReposEspecificos1 = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(5))
+      Future{obtenerRepositorioEspecifico(dueño,nombre)}
+    }
+
+    //implicit val ecParaReposEspecificos2 = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(5))
+
+    //Evaluacion del método
+    val b=futuroRepositorioEspecifico("Daniel","Hello Word").map(x=>x)
+
+    //Comprobar el resultado
+    val repositorioEspecificoDaniel=Await.result(b,1 seconds)
+
+    assert(repositorioEspecificoDaniel===Repositorio("Daniel","Hello Word","Java",1000))
+
+    //--------------------Punto 3--------------------------------------------
+    def obtenerUsuarioCompleto(nombreUsuario: String): UsuarioCompleto={
+      val repos=obtenerRepositorios(nombreUsuario)
+      val lenguajes=repos.groupBy(x=>x.lenguaje).mapValues(_.length)
+      UsuarioCompleto(repos,lenguajes)
+    }
+
+    def futuroObtenerUsuarioCompleto(nombreUsuario:String):Future[UsuarioCompleto]={
+      Future{obtenerUsuarioCompleto("Daniel")}
+    }
+
+    val c= futuroObtenerUsuarioCompleto("Daniel")
+    val uc=Await.result(c,1 seconds)
+    assert(uc===UsuarioCompleto(List(Repositorio("Daniel","Hello Word","Java",1000), Repositorio("Daniel","FizzBuzz","Java",3000), Repositorio("Daniel","calculadora","Scala",500)),Map("Scala" -> 1, "Java" -> 2)))
+
+
+
+  }
+
   test("Los future **iniciados** fuera de un for-comp deben iniciar al mismo tiempo") {
 
     val timeForf1 = 100
@@ -338,7 +466,7 @@ class FutureSuite extends FunSuite {
   }
 
   test("Future.traverse"){
-    def foo(i:List[Int]):Future[Int]=Future.successful(i.sum/i.size)
+    //def foo(i:List[Int]):Future[Int]=Future.successful(i.sum/i.size)
     val resFuture = Future.traverse(Range(1,11).map(Future.successful(_))){
       x => x
     }.map(l => l.sum/l.size)
@@ -348,6 +476,8 @@ class FutureSuite extends FunSuite {
     assert(res ==  Range(1,11).sum/Range(1,11).size)
 
   }
+
+
 
 
 }
