@@ -21,6 +21,8 @@ class CurryingSuite extends FunSuite with Matchers{
     assert(e2==2)
   }
 
+
+
   test("Una funcion curreada puede ser expresada de otra forma"){
     //Esta es una función curreada
     def f(a:Int) = { b:Int =>
