@@ -155,6 +155,12 @@ class ListSuite extends FunSuite {
     }
   }
 
+  test("ScanLeft"){
+    val lista=List("Andres", "Felipe", "Juan", "Carlos")
+    val res=lista.scanLeft("")(_+_)
+    println(res)
+  }
+
 
   test("Una lista se debe poder acumular en una direccion determinada (izquierda)") {
     val lista = List("Andres", "Felipe", "Juan", "Carlos")
